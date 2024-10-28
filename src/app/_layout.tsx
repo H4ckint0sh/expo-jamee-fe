@@ -1,39 +1,32 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { Tabs } from 'expo-router'
-import TabBar from '../components/TabBar'
+import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import React from 'react';
+import { useEffect } from 'react';
+import 'react-native-reanimated';
 
-const _layout = () => {
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
+
+export default function RootLayout() {
+    const [loaded] = useFonts({
+        SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    });
+
+    useEffect(() => {
+        if (loaded) {
+            SplashScreen.hideAsync();
+        }
+    }, [loaded]);
+
+    if (!loaded) {
+        return null;
+    }
+
     return (
-        <Tabs
-            tabBar={props => <TabBar {...props} />}
-        >
-            <Tabs.Screen
-                name="index"
-                options={{
-                    title: "News"
-                }}
-            />
-            <Tabs.Screen
-                name="calendar"
-                options={{
-                    title: "Calendar"
-                }}
-            />
-            <Tabs.Screen
-                name="prayTimes"
-                options={{
-                    title: "Pray Times"
-                }}
-            />
-            <Tabs.Screen
-                name="profile"
-                options={{
-                    title: "Profile"
-                }}
-            />
-        </Tabs>
-    )
+        <Stack>
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        </Stack>
+    );
 }
-
-export default _layout
