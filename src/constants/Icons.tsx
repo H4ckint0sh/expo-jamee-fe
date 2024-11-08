@@ -19,7 +19,7 @@ export const icon = {
         ) : (
             <Ionicons name="moon-outline" size={22} color={color} />
         ),
-    settings: ({ color, focused }: { color: string; focused: boolean }) =>
+    setting: ({ color, focused }: { color: string; focused: boolean }) =>
         focused ? (
             <Ionicons name="settings" size={24} color={color} />
         ) : (

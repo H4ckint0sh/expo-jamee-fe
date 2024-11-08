@@ -16,6 +16,14 @@
       ]
     ],
     "name": "expo-jamee",
-    "slug": "expo-jamee"
+    "slug": "expo-jamee",
+    "extra": {
+      "eas": {
+        "projectId": "a34f8851-ef75-407f-b7cb-d41fd1b14366"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.h4ckint0sh.expojamee"
+    }
   }
 }
