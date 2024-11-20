@@ -4,90 +4,122 @@ import {
   Image,
   ImageSourcePropType,
   Text,
+  View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import useColors from "../hooks/useColors";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Font from "../constants/Font";
 import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "@/constants/Colors";
+import { scrollTo } from "react-native-reanimated";
 
-export type HorizontalItem = {
+export type CategoryItem = {
   id: number;
   name: string;
   image?: ImageSourcePropType;
 };
 
 type Props = {
-  items: HorizontalItem[];
-  onClick?: (item: HorizontalItem) => void;
+  items: CategoryItem[];
+  onClick?: (item: CategoryItem) => void;
   showAddButton?: boolean;
 };
 
-const HorizontalItems: React.FC<Props> = ({
-  items,
-  onClick,
-  showAddButton,
-}) => {
+const CategoryList: React.FC<Props> = ({ items, onClick, showAddButton }) => {
   const colors = useColors();
-  const [active, setActive] = useState<number>(-1);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const scrollRef = useRef<ScrollView>(null);
+  const itemRef = useRef<TouchableOpacity[] | null[]>([]);
+
+  const handleSelectCategory = (index: number) => {
+    const selected = itemRef.current[index];
+    setActiveIndex(index);
+    onClick?.(items[index]);
+
+    selected?.measure((x) => {
+      scrollRef.current?.scrollTo({ x: x, y: 0, animated: true });
+    });
+  };
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      <>
-        {showAddButton && <AddButton rounded={!!items[0].image} />}
-        {items.map((item, index) =>
-          item.image ? (
-            <TouchableOpacity
-              key={item.id}
-              onPress={() => (setActive(index), onClick?.(item))}
-              style={{
-                height: 70,
-                width: 70,
-                backgroundColor: colors.primary,
-                borderRadius: Spacing.borderRadius.xxl,
-                padding: Spacing.padding.sm,
-                marginRight: Spacing.margin.base,
-              }}
-            >
-              <Image
-                source={item.image}
+    <View style={{ flexDirection: "column" }}>
+      <Text
+        style={{
+          fontSize: FontSize.base,
+          fontFamily: Font["poppins-bold"],
+          fontWeight: "600",
+          marginBottom: 20,
+        }}
+      >
+        Trending Right Now
+      </Text>
+
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      >
+        <>
+          {showAddButton && <AddButton rounded={false} />}
+          {items.map((item, index) =>
+            item.image ? (
+              <TouchableOpacity
+                key={index}
+                ref={(el) => (itemRef.current[index] = el)}
+                onPress={() => handleSelectCategory(index)}
                 style={{
-                  height: "100%",
-                  width: "100%",
-                }}
-                resizeMode='contain'
-              />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              key={item.id}
-              onPress={() => (setActive(index), onClick?.(item))}
-              style={{
-                backgroundColor:
-                  active === index ? colors.primary : colors.background,
-                paddingHorizontal: Spacing.padding.lg,
-                paddingVertical: Spacing.margin.base,
-                borderRadius: Spacing.borderRadius.xl,
-                marginRight: Spacing.margin.base,
-                borderWidth: 1,
-                borderColor: active === index ? colors.primary : colors.border,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: FontSize.sm,
-                  fontFamily: Font["poppins-semiBold"],
-                  color: active === index ? colors.onPrimary : colors.text,
+                  height: 70,
+                  width: 70,
+                  backgroundColor: colors.primary,
+                  borderRadius: Spacing.borderRadius.xxl,
+                  padding: Spacing.padding.sm,
+                  marginRight: Spacing.margin.base,
                 }}
               >
-                {item.name}
-              </Text>
-            </TouchableOpacity>
-          )
-        )}
-      </>
-    </ScrollView>
+                <Image
+                  source={item.image}
+                  style={{
+                    height: "100%",
+                    width: "100%",
+                  }}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                key={item.id}
+                ref={(el) => (itemRef.current[index] = el)}
+                onPress={() => handleSelectCategory(index)}
+                style={{
+                  paddingHorizontal: Spacing.padding.lg,
+                  paddingVertical: Spacing.margin.base,
+                  borderRadius: Spacing.borderRadius.base,
+                  marginRight: Spacing.margin.base,
+                  borderWidth: 1,
+                  backgroundColor:
+                    activeIndex === index ? Colors.tint : colors.background,
+                  borderColor:
+                    activeIndex === index ? Colors.tint : colors.border,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: FontSize.sm,
+                    fontWeight: "600",
+                    color:
+                      activeIndex === index ? Colors.white : Colors.softText,
+                  }}
+                >
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            ),
+          )}
+        </>
+      </ScrollView>
+    </View>
   );
 };
 type AddButtonProps = {
@@ -110,7 +142,7 @@ const AddButton: React.FC<AddButtonProps> = ({ rounded = false }) => {
               height: 70,
               width: 70,
               padding: Spacing.padding.sm,
-              borderRadius: Spacing.borderRadius.xxl,
+              borderRadius: Spacing.borderRadius.base,
             }
           : {
               paddingVertical: Spacing.padding.sm,
@@ -119,9 +151,9 @@ const AddButton: React.FC<AddButtonProps> = ({ rounded = false }) => {
             },
       ]}
     >
-      <Ionicons name='add' size={rounded ? FontSize.lg : FontSize.sm} />
+      <Ionicons name="add" size={rounded ? FontSize.lg : FontSize.sm} />
     </TouchableOpacity>
   );
 };
 
-export default HorizontalItems;
+export default CategoryList;

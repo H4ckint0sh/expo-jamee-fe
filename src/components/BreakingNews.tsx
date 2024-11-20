@@ -20,7 +20,7 @@ const BreakingNews: React.FC = () => {
   const ref = useAnimatedRef<Animated.FlatList<any>>();
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const interval = useRef<NodeJS.Timeout>();
-  const offset = useSharedValue(9);
+  const offset = useSharedValue(0);
   const { width } = useWindowDimensions();
 
   const onViewableItemsChanged = ({
@@ -108,7 +108,7 @@ const BreakingNews: React.FC = () => {
             viewabilityConfigCallbackPairs.current as any
           }
           onScrollEndDrag={() => setIsAutoPlay(false)}
-          onScrollBeginDrag={() => setIsAutoPlay(true)}
+          onScrollBeginDrag={() => setIsAutoPlay(false)}
         />
       </View>
       <Pagination
