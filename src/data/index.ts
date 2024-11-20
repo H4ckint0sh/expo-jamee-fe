@@ -122,8 +122,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi. Fusce v
 
 *Disclaimer: This news article is fictional, and any resemblance to real events or persons is purely coincidental.*
 `;
-
-export const NewsList: News[] = [
+export const BreakingNewsList: News[] = [
   {
     id: 1,
     title:
@@ -167,6 +166,9 @@ export const NewsList: News[] = [
     time: "4h ago",
     body: newsBody,
   },
+];
+
+export const NewsList: News[] = [
   {
     id: 14,
     title:
