@@ -1,14 +1,15 @@
-import React, { useRef, useState } from "react";
-import { Text, View, ViewToken } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Text, View, ViewToken, useWindowDimensions } from "react-native";
 import Animated, {
   useAnimatedRef,
   useAnimatedScrollHandler,
+  useDerivedValue,
   useSharedValue,
+  scrollTo,
 } from "react-native-reanimated";
 import Font from "../constants/Font";
 import FontSize from "../constants/FontSize";
-import { BreakingNewsList, News, NewsList } from "../data";
-import { HorizontalItem } from "./HorizontalItems";
+import { BreakingNewsList, News } from "../data";
 import SliderItem from "./SliderItem";
 import Pagination from "./SliderPagination";
 
@@ -17,6 +18,10 @@ const BreakingNews: React.FC = () => {
   const [paginationIndex, setPaginationIndex] = useState(0);
   const scrollX = useSharedValue(0);
   const ref = useAnimatedRef<Animated.FlatList<any>>();
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const interval = useRef<NodeJS.Timeout>();
+  const offset = useSharedValue(9);
+  const { width } = useWindowDimensions();
 
   const onViewableItemsChanged = ({
     viewableItems,
@@ -31,6 +36,24 @@ const BreakingNews: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    if (isAutoPlay === true) {
+      interval.current = setInterval(() => {
+        offset.value = offset.value + width;
+      }, 5000);
+    } else {
+      clearInterval(interval.current);
+    }
+
+    return () => {
+      clearInterval(interval.current);
+    };
+  }, [isAutoPlay, offset, width]);
+
+  useDerivedValue(() => {
+    scrollTo(ref, offset.value, 0, true);
+  });
+
   const viewabilityConfig = {
     itemVisiblePercentThreshold: 50,
   };
@@ -41,8 +64,11 @@ const BreakingNews: React.FC = () => {
   ]);
 
   const onScrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollX.value = event.contentOffset.x;
+    onScroll: (e) => {
+      scrollX.value = e.contentOffset.x;
+    },
+    onMomentumEnd: (e) => {
+      scrollX.value = e.contentOffset.x;
     },
   });
 
@@ -50,11 +76,10 @@ const BreakingNews: React.FC = () => {
     <>
       <Text
         style={{
-          fontSize: FontSize.lg,
-          fontFamily: Font["poppins-bold"],
-          textTransform: "uppercase",
-          marginLeft: 20,
+          fontSize: FontSize.base,
+          fontWeight: "600",
           marginBottom: 20,
+          marginLeft: 20,
         }}
       >
         Breaking news
@@ -82,6 +107,8 @@ const BreakingNews: React.FC = () => {
           viewabilityConfigCallbackPairs={
             viewabilityConfigCallbackPairs.current as any
           }
+          onScrollEndDrag={() => setIsAutoPlay(false)}
+          onScrollBeginDrag={() => setIsAutoPlay(true)}
         />
       </View>
       <Pagination
