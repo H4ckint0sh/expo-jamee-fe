@@ -1,15 +1,22 @@
+import Font from "@/constants/Font";
+import FontSize from "@/constants/FontSize";
+import { News } from "@/data";
+import { LinearGradient } from "expo-linear-gradient";
+import { Link } from "expo-router";
 import React from "react";
+import {
+  Dimensions,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import Animated, {
   Extrapolation,
   SharedValue,
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
-import { Dimensions, View, Text, Image, StyleSheet } from "react-native";
-import { News } from "@/data";
-import FontSize from "@/constants/FontSize";
-import Font from "@/constants/Font";
 
 type Props = {
   slideItem: News;
@@ -43,20 +50,24 @@ const SliderItem = ({ slideItem, index, scrollX }: Props) => {
     };
   });
   return (
-    <Animated.View
-      style={[styles.itemWrapper, animatedStyles]}
-      key={slideItem.id}
-    >
-      <Image source={slideItem.image} style={styles.image} />
-      <LinearGradient
-        colors={["transparent", "rgba(0,0,0,0.8)"]}
-        style={styles.background}
-      >
-        <Text numberOfLines={2} style={styles.title}>
-          {slideItem.title}
-        </Text>
-      </LinearGradient>
-    </Animated.View>
+    <Link href={`/news/${slideItem.id}`} asChild>
+      <TouchableOpacity>
+        <Animated.View
+          style={[styles.itemWrapper, animatedStyles]}
+          key={slideItem.id}
+        >
+          <Image source={slideItem.image} style={styles.image} />
+          <LinearGradient
+            colors={["transparent", "rgba(0,0,0,0.8)"]}
+            style={styles.background}
+          >
+            <Text numberOfLines={2} style={styles.title}>
+              {slideItem.title}
+            </Text>
+          </LinearGradient>
+        </Animated.View>
+      </TouchableOpacity>
+    </Link>
   );
 };
 
@@ -68,7 +79,6 @@ const styles = StyleSheet.create({
     width: width,
     justifyContent: "center",
     alignItems: "center",
-    display: "flex",
   },
   image: {
     width: width - 60,

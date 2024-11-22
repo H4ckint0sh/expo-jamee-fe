@@ -7,7 +7,6 @@ import Animated, {
   useSharedValue,
   scrollTo,
 } from "react-native-reanimated";
-import Font from "../constants/Font";
 import FontSize from "../constants/FontSize";
 import { BreakingNewsList, News } from "../data";
 import SliderItem from "./SliderItem";
@@ -29,8 +28,8 @@ const BreakingNews: React.FC = () => {
     viewableItems: ViewToken[];
   }) => {
     if (
-      viewableItems[0].index !== undefined &&
-      viewableItems[0].index !== null
+      viewableItems[0]?.index !== undefined &&
+      viewableItems[0]?.index !== null
     ) {
       setPaginationIndex(viewableItems[0].index % data.length);
     }
@@ -73,7 +72,7 @@ const BreakingNews: React.FC = () => {
   });
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <Text
         style={{
           fontSize: FontSize.base,
@@ -84,7 +83,7 @@ const BreakingNews: React.FC = () => {
       >
         Breaking news
       </Text>
-      <View>
+      <View style={{ justifyContent: "center" }}>
         <Animated.FlatList
           ref={ref}
           data={data}
@@ -116,7 +115,7 @@ const BreakingNews: React.FC = () => {
         paginationIndex={paginationIndex}
         scrollX={scrollX}
       />
-    </>
+    </View>
   );
 };
 

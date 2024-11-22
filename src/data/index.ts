@@ -1,4 +1,5 @@
 import { ImageSourcePropType } from "react-native";
+import Animated from "react-native-reanimated";
 
 type User = {
   name: string;
@@ -400,3 +401,5 @@ export const NewsList: News[] = [
     body: newsBody,
   },
 ];
+
+export const AllNews: News[] = [...BreakingNewsList, ...NewsList];
