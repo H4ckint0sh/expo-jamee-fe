@@ -51,41 +51,6 @@ export interface Props {
 
 export default (props: Props) => {
   const styles = useStyles();
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null,
-  );
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  const getLocation = async () => {
-    try {
-      // Ask for location permissions
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      // Get the user's current location
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
-    } catch (error) {
-      Alert.alert("Error", "Failed to get location");
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    getLocation();
-  }, []);
-
-  useEffect(() => {
-    if (errorMsg) {
-      Alert.alert("Error", errorMsg);
-    }
-    if (location) {
-      console.log("location", location);
-    }
-  }, [errorMsg, location]);
 
   const includedKeys = [
     "asr",

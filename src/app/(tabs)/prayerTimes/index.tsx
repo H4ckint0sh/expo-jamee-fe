@@ -91,6 +91,7 @@ export default function PrayerTimes() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null,
   );
+  const [locationName, setLocationName] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const getLocation = async () => {
@@ -104,6 +105,19 @@ export default function PrayerTimes() {
 
       // Get the user's current location
       const currentLocation = await Location.getCurrentPositionAsync({});
+      // Reverse geocode to get the location name
+      const [place] = await Location.reverseGeocodeAsync({
+        latitude: currentLocation.coords.latitude,
+        longitude: currentLocation.coords.longitude,
+      });
+
+      if (place) {
+        const name = `${place.city || place.region || ""}, ${place.country || ""}`;
+        setLocationName(name);
+      } else {
+        setLocationName("Unknown location");
+      }
+
       setLocation(currentLocation);
     } catch (error) {
       Alert.alert("Error", "Failed to get location");
@@ -115,7 +129,10 @@ export default function PrayerTimes() {
     if (location) {
       console.log("location", location);
     }
-  }, [location]);
+    if (locationName) {
+      console.log("locationName", locationName);
+    }
+  }, [location, locationName]);
 
   useEffect(() => {
     getLocation();
@@ -146,7 +163,7 @@ export default function PrayerTimes() {
 
       <View style={styles.container}>
         <View style={styles.screenContent}>
-          <Text style={styles.screenTitle}>Alvesta</Text>
+          <Text style={styles.screenTitle}>{locationName}</Text>
           <View style={styles.screenSubtitle}>
             <Pressable onPress={() => setOpen(true)}>
               <Text style={styles.selectedDate}>{formatDate(date)}</Text>
