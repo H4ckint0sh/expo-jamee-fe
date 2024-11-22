@@ -4,35 +4,35 @@
  */
 
 import { News } from "./data";
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-export interface SettingsRouteParams { }
+export interface SettingsRouteParams {}
 
-export interface PrayersRouteParams { }
+export interface PrayersRouteParams {}
 
 export type RouteStackParams = {
-    Prayers: PrayersRouteParams;
-    Settings: SettingsRouteParams;
+  Prayers: PrayersRouteParams;
+  Profile: SettingsRouteParams;
 };
 
-export type RouteParams<T extends keyof RouteStackParams> = NativeStackScreenProps<RouteStackParams, T>;
+export type RouteParams<T extends keyof RouteStackParams> =
+  NativeStackScreenProps<RouteStackParams, T>;
 
 export type RootStackType = {
-    HomeTabs: undefined;
-    Details: { news: string };
+  HomeTabs: undefined;
+  Details: { news: string };
 };
 
 export type TabNavigatorType = {
-    HomeNavigator: undefined;
-    NewsNavigator: undefined;
-    SettingsScreen: undefined;
+  HomeNavigator: undefined;
+  NewsNavigator: undefined;
+  SettingsScreen: undefined;
 };
 
 export type HomeNavigatorType = {
-    Home: undefined;
+  Home: undefined;
 };
 
 export type NewsNavigatorType = {
-    News: undefined;
+  News: undefined;
 };
-
