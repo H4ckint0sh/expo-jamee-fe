@@ -1,8 +1,10 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { useAppTheme } from "../hooks/useApptheme";
 import { Colors } from "@/constants/Colors";
 import Spacing from "@/constants/Spacing";
+import moment from "moment-timezone";
+import * as Location from "expo-location";
 
 const useStyles = () => {
   const theme = useAppTheme();
@@ -38,24 +40,70 @@ const useStyles = () => {
   });
 };
 
-function formatTime(hour: number, minute: number): string {
-  const h = String(hour > 12 ? hour - 12 : hour);
-  const m = minute.toString().padStart(2, "0");
-  const a = hour > 12 ? "pm" : "am";
-  return `${h}:${m} ${a}`;
+function getTime(date: Date): string {
+  const time = moment(date).tz("Europe/Berlin").format("h:mm A");
+  return time;
 }
 
 export interface Props {
-  entries: { key: string; val: { hour: number; minute: number } }[];
+  entries: any;
 }
 
 export default (props: Props) => {
   const styles = useStyles();
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null,
+  );
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const getLocation = async () => {
+    try {
+      // Ask for location permissions
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      // Get the user's current location
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
+    } catch (error) {
+      Alert.alert("Error", "Failed to get location");
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getLocation();
+  }, []);
+
+  useEffect(() => {
+    if (errorMsg) {
+      Alert.alert("Error", errorMsg);
+    }
+    if (location) {
+      console.log("location", location);
+    }
+  }, [errorMsg, location]);
+
+  const includedKeys = [
+    "asr",
+    "dhuhr",
+    "isha",
+    "sunrise",
+    "sunset",
+    "maghrib",
+    "fajr",
+  ];
+  const filteredPrayerTimes = Object.fromEntries(
+    Object.entries(props.entries).filter(([key]) => includedKeys.includes(key)),
+  );
 
   return (
     <View style={styles.container}>
-      {props.entries.map(({ key, val }, i) => {
-        const isLast = i === props.entries.length - 1;
+      {Object.entries(filteredPrayerTimes).map(([key, val], i) => {
+        const isLast = i === Object.keys(filteredPrayerTimes).length - 1;
         return (
           <View
             key={key}
@@ -66,7 +114,7 @@ export default (props: Props) => {
             ]}
           >
             <Text style={styles.key}>{key}</Text>
-            <Text style={styles.val}>{formatTime(val.hour, val.minute)}</Text>
+            <Text style={styles.val}>{getTime(val as Date)}</Text>
           </View>
         );
       })}

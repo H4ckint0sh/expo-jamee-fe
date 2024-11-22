@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -7,13 +8,22 @@ import {
   View,
 } from "react-native";
 // import DatePicker from "react-native-date-picker";
-import { usePrayerTimes } from "../../../hooks/usePrayerTimes";
 import { useAppTheme } from "../../../hooks/useApptheme";
 import { usePreferences } from "../../../hooks/usePreferences";
 import { Link, Stack, router, useRouter } from "expo-router";
 import Table from "../../../components/PrayerTimesTable";
 import { Colors } from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { usePrayerTimes } from "../../../hooks/usePrayerTimes";
+import * as Location from "expo-location";
+
+import {
+  Coordinates,
+  CalculationMethod,
+  PrayerTimes as PrayTimesCalculator,
+  Prayer,
+  Qibla,
+} from "../../../shared/prayTimes/Adhan";
 
 const useStyles = () => {
   const theme = useAppTheme();
@@ -78,8 +88,47 @@ export default function PrayerTimes() {
   const theme = useAppTheme();
   const { appTheme } = usePreferences();
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const entries = usePrayerTimes(date);
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null,
+  );
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const getLocation = async () => {
+    try {
+      // Ask for location permissions
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      // Get the user's current location
+      const currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
+    } catch (error) {
+      Alert.alert("Error", "Failed to get location");
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (location) {
+      console.log("location", location);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    getLocation();
+  }, []);
+
+  const coordinates = new Coordinates(
+    location?.coords.latitude,
+    location?.coords.longitude,
+  );
+  const params = CalculationMethod.Tehran();
+  const date = new Date();
+  const prayerTimes = new PrayTimesCalculator(coordinates, date, params);
+  console.log("prayTimes", prayerTimes);
 
   return (
     <>
@@ -103,7 +152,7 @@ export default function PrayerTimes() {
               <Text style={styles.selectedDate}>{formatDate(date)}</Text>
             </Pressable>
           </View>
-          <Table entries={entries} />
+          <Table entries={prayerTimes} />
         </View>
 
         {/* <View style={styles.screenBottom}> */}

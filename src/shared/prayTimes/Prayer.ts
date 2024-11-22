@@ -1,11 +1,11 @@
-const Prayer = {
-  Fajr: 'fajr',
-  Sunrise: 'sunrise',
-  Dhuhr: 'dhuhr',
-  Asr: 'asr',
-  Maghrib: 'maghrib',
-  Isha: 'isha',
-  None: 'none',
-} as const;
+enum Prayer {
+  Fajr = "Fajr",
+  Sunrise = "Sunrise",
+  Dhuhr = "Dhuhr",
+  Asr = "Asr",
+  Maghrib = "Maghrib",
+  Isha = "Isha",
+  None = "None",
+}
 
 export default Prayer;
