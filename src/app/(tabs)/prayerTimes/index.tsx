@@ -6,6 +6,8 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ScrollView,
+  SafeAreaView,
 } from "react-native";
 // import DatePicker from "react-native-date-picker";
 import { useAppTheme } from "../../../hooks/useApptheme";
@@ -23,64 +25,98 @@ import {
   PrayerTimes as PrayTimesCalculator,
   Prayer,
   Qibla,
+  HighLatitudeRule,
+  Shafaq,
 } from "../../../shared/prayTimes/Adhan";
+import Spacing from "@/constants/Spacing";
+import moment from "moment";
 
 const useStyles = () => {
   const theme = useAppTheme();
   return StyleSheet.create({
-    container: {
-      flex: 1,
-    },
+    container: {},
     screenContent: {
-      flex: 1,
-      flexDirection: "column",
-      alignItems: "center",
-      gap: 20,
-      justifyContent: "center",
+      marginHorizontal: Spacing.margin.base,
     },
-    screenTitle: {
-      fontSize: 30,
+    locationName: {
+      fontSize: 18,
+      width: "100%",
+      textAlign: "center",
       fontWeight: "600",
       letterSpacing: 1,
-      color: theme.textColor,
+      marginTop: 20,
     },
-    screenSubtitle: {
+    buttonContainer: {
+      display: "flex",
+      width: "100%",
       flexDirection: "row",
+      justifyContent: "space-around",
+      alignItems: "center",
+      paddingHorizontal: 30,
+      marginVertical: 20,
+    },
+    button: {
+      display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      marginTop: 10,
+      color: Colors.softText,
     },
-    selectedDate: {
-      fontSize: 15,
-      color: theme.linkColor,
+    dates: {
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    date: {
+      fontSize: 16,
       letterSpacing: 1,
-      textTransform: "uppercase",
+      fontWeight: "600",
+      textTransform: "capitalize",
+      marginVertical: 3,
     },
     screenBottom: {
       marginBottom: 40,
     },
     bottomLink: {
       fontSize: 15,
-      color: theme.linkColor,
       letterSpacing: 1,
+    },
+    textContainer: {
+      backgroundColor: "#FFF3CD",
+      padding: 10,
+      marginVertical: 20,
+      borderRadius: Spacing.borderRadius.lg,
+      borderWidth: 1,
+      borderColor: "#FFEEBA",
+    },
+    attentionText: {
+      color: "#856404",
+      fontSize: 14,
+    },
+    bold: {
+      fontWeight: "bold",
     },
   });
 };
 
-function formatDate(date: Date): string {
+function formatDate(date: Date): string[] {
   const parts = [
     date.toLocaleString("en", {
       month: "short",
       day: "numeric",
       year: "numeric",
     }),
-    date.toLocaleString("ar-TN-u-ca-islamic", {
+    new Intl.DateTimeFormat("ar-IQ-u-ca-islamic", {
       month: "short",
       day: "numeric",
       year: "numeric",
-    }),
+    }).format(date),
+    new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(date),
   ];
-  return parts.join("  |  ");
+  return parts;
 }
 
 export default function PrayerTimes() {
@@ -93,6 +129,8 @@ export default function PrayerTimes() {
   );
   const [locationName, setLocationName] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [prayerTimes, setPrayerTimes] = useState<PrayTimesCalculator>();
 
   const getLocation = async () => {
     try {
@@ -126,15 +164,6 @@ export default function PrayerTimes() {
   };
 
   useEffect(() => {
-    if (location) {
-      console.log("location", location);
-    }
-    if (locationName) {
-      console.log("locationName", locationName);
-    }
-  }, [location, locationName]);
-
-  useEffect(() => {
     getLocation();
   }, []);
 
@@ -142,35 +171,74 @@ export default function PrayerTimes() {
     location?.coords.latitude,
     location?.coords.longitude,
   );
-  const params = CalculationMethod.Tehran();
-  const date = new Date();
-  const prayerTimes = new PrayTimesCalculator(coordinates, date, params);
-  console.log("prayTimes", prayerTimes);
+  var params = CalculationMethod.Tehran();
+  params.shafaq = Shafaq.Ahmer;
+
+  useEffect(() => {
+    if (location) {
+      const prayerTimes = new PrayTimesCalculator(
+        coordinates,
+        selectedDate ? selectedDate : new Date(),
+        params,
+      );
+      setPrayerTimes(prayerTimes);
+    }
+  }, [location, locationName, selectedDate]);
+
+  const handlePreviousDay = () => {
+    setSelectedDate((prevDate) => moment(prevDate).subtract(1, "day").toDate());
+  };
+
+  const handleNextDay = () => {
+    setSelectedDate((prevDate) => moment(prevDate).add(1, "day").toDate());
+  };
 
   return (
     <>
       <Stack.Screen
         options={{
-          headerLeft: () => null,
-          headerRight: () => (
-            <TouchableOpacity onPress={() => {}}>
-              <Ionicons name="settings-outline" size={22} />
-            </TouchableOpacity>
-          ),
-          title: "",
+          headerShown: false,
         }}
       />
 
-      <View style={styles.container}>
-        <View style={styles.screenContent}>
-          <Text style={styles.screenTitle}>{locationName}</Text>
-          <View style={styles.screenSubtitle}>
-            <Pressable onPress={() => setOpen(true)}>
-              <Text style={styles.selectedDate}>{formatDate(date)}</Text>
-            </Pressable>
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.screenContent}>
+          <Text style={styles.locationName}>{locationName}</Text>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity onPress={handlePreviousDay} style={styles.button}>
+              <Ionicons
+                name="arrow-back-circle-outline"
+                size={40}
+                color={Colors.softText}
+              />
+            </TouchableOpacity>
+            <View style={styles.dates}>
+              {formatDate(selectedDate || new Date()).map((date, i) => (
+                <Text key={i} style={styles.date}>
+                  {date}
+                </Text>
+              ))}
+            </View>
+            <TouchableOpacity onPress={handleNextDay} style={styles.button}>
+              <Ionicons
+                name="arrow-forward-circle-outline"
+                size={40}
+                color={Colors.softText}
+              />
+            </TouchableOpacity>
           </View>
-          <Table entries={prayerTimes} />
-        </View>
+          <Table prayerTimes={prayerTimes} />
+          <View style={styles.textContainer}>
+            <Text style={styles.attentionText}>
+              ⚠️ **Attention:** Due to the complexity of calculations and
+              potential variances in location accuracy, please allow for a
+              possible{" "}
+              <Text style={styles.bold}>10-minute margin of error</Text> in the
+              displayed prayer times. Always verify with your local mosque or
+              trusted source for precise timings.
+            </Text>
+          </View>
+        </ScrollView>
 
         {/* <View style={styles.screenBottom}> */}
         {/*   <Link href="/(tabs)/prayerTimes/settings"> */}
@@ -195,7 +263,7 @@ export default function PrayerTimes() {
         {/*     setDate(new Date()); */}
         {/*   }} */}
         {/* /> */}
-      </View>
+      </SafeAreaView>
     </>
   );
 }

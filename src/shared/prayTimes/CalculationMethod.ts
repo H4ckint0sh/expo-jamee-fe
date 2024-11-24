@@ -1,36 +1,36 @@
-import CalculationParameters from './CalculationParameters';
-import { Rounding } from './Rounding';
+import CalculationParameters from "./CalculationParameters";
+import { Rounding } from "./Rounding";
 
 const CalculationMethod = {
   // Muslim World League
   MuslimWorldLeague() {
-    const params = new CalculationParameters('MuslimWorldLeague', 18, 17);
+    const params = new CalculationParameters("MuslimWorldLeague", 18, 17);
     params.methodAdjustments.dhuhr = 1;
     return params;
   },
 
   // Egyptian General Authority of Survey
   Egyptian() {
-    const params = new CalculationParameters('Egyptian', 19.5, 17.5);
+    const params = new CalculationParameters("Egyptian", 19.5, 17.5);
     params.methodAdjustments.dhuhr = 1;
     return params;
   },
 
   // University of Islamic Sciences, Karachi
   Karachi() {
-    const params = new CalculationParameters('Karachi', 18, 18);
+    const params = new CalculationParameters("Karachi", 18, 18);
     params.methodAdjustments.dhuhr = 1;
     return params;
   },
 
   // Umm al-Qura University, Makkah
   UmmAlQura() {
-    return new CalculationParameters('UmmAlQura', 18.5, 0, 90);
+    return new CalculationParameters("UmmAlQura", 18.5, 0, 90);
   },
 
   // Dubai
   Dubai() {
-    const params = new CalculationParameters('Dubai', 18.2, 18.2);
+    const params = new CalculationParameters("Dubai", 18.2, 18.2);
     params.methodAdjustments = {
       ...params.methodAdjustments,
       sunrise: -3,
@@ -43,7 +43,7 @@ const CalculationMethod = {
 
   // Moonsighting Committee
   MoonsightingCommittee() {
-    const params = new CalculationParameters('MoonsightingCommittee', 18, 18);
+    const params = new CalculationParameters("MoonsightingCommittee", 18, 18);
     params.methodAdjustments = {
       ...params.methodAdjustments,
       dhuhr: 5,
@@ -55,24 +55,24 @@ const CalculationMethod = {
 
   // ISNA
   NorthAmerica() {
-    const params = new CalculationParameters('NorthAmerica', 15, 15);
+    const params = new CalculationParameters("NorthAmerica", 15, 15);
     params.methodAdjustments.dhuhr = 1;
     return params;
   },
 
   // Kuwait
   Kuwait() {
-    return new CalculationParameters('Kuwait', 18, 17.5);
+    return new CalculationParameters("Kuwait", 18, 17.5);
   },
 
   // Qatar
   Qatar() {
-    return new CalculationParameters('Qatar', 18, 0, 90);
+    return new CalculationParameters("Qatar", 18, 0, 90);
   },
 
   // Singapore
   Singapore() {
-    const params = new CalculationParameters('Singapore', 20, 18);
+    const params = new CalculationParameters("Singapore", 20, 18);
     params.methodAdjustments.dhuhr = 1;
     params.rounding = Rounding.Up;
     return params;
@@ -80,13 +80,19 @@ const CalculationMethod = {
 
   // Institute of Geophysics, University of Tehran
   Tehran() {
-    const params = new CalculationParameters('Tehran', 17.7, 14, 0, 4.5);
+    const params = new CalculationParameters("Tehran", 17.7, 14, 0, 4.5);
+    return params;
+  },
+
+  // Jafari Ithna-Ashari, Leva Institute, Qum
+  Jafari() {
+    const params = new CalculationParameters("Jafari", 16, 14, 0, 4);
     return params;
   },
 
   // Dianet
   Turkey() {
-    const params = new CalculationParameters('Turkey', 18, 17);
+    const params = new CalculationParameters("Turkey", 18, 17);
     params.methodAdjustments = {
       ...params.methodAdjustments,
       sunrise: -7,
@@ -99,7 +105,7 @@ const CalculationMethod = {
 
   // Other
   Other() {
-    return new CalculationParameters('Other', 0, 0);
+    return new CalculationParameters("Other", 0, 0);
   },
 } as const;
 

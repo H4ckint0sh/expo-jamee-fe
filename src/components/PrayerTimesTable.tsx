@@ -1,84 +1,149 @@
-import React, { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
-import { useAppTheme } from "../hooks/useApptheme";
 import { Colors } from "@/constants/Colors";
+import { getPrayerIcon } from "@/constants/PrayTimesIcons";
 import Spacing from "@/constants/Spacing";
+import { Prayer, PrayerTimes } from "@/shared/prayTimes/Adhan";
 import moment from "moment-timezone";
-import * as Location from "expo-location";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 const useStyles = () => {
-  const theme = useAppTheme();
   return StyleSheet.create({
     container: {
-      marginTop: 30,
+      borderWidth: 1,
       borderRadius: Spacing.borderRadius.lg,
-      marginHorizontal: 20,
-      padding: 40,
+      borderColor: Colors.border,
+      padding: 20,
       backgroundColor: Colors.white,
     },
     row: {
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      paddingVertical: 12,
+      paddingVertical: 10,
       width: "100%",
+      height: 40,
+      borderWidth: 1,
+      borderRadius: Spacing.borderRadius.base,
+      borderColor: Colors.border,
+      marginVertical: 4,
+      paddingHorizontal: 10,
     },
     key: {
-      fontSize: 18,
-      fontWeight: "600",
+      fontSize: 16,
+      textTransform: "capitalize",
       letterSpacing: 1,
-      color: theme.textColor,
+      color: Colors.black,
+    },
+    nameContainer: {
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
     },
     val: {
-      fontSize: 18,
-      color: theme.textColor,
-      borderStyle: "dashed",
+      fontSize: 14,
+      fontWeight: "600",
+      color: Colors.black,
       borderRadius: 1,
-      borderColor: theme.lineColor,
-      borderLeftWidth: StyleSheet.hairlineWidth,
+      marginRight: 10,
+    },
+    icon: {
+      display: "flex",
+      alignItems: "baseline",
+      justifyContent: "center",
+      width: 25,
+      marginRight: 10,
+    },
+    countdown: {
+      color: Colors.tint,
+      fontWeight: "600",
+      fontSize: 14,
     },
   });
 };
 
 function getTime(date: Date): string {
-  const time = moment(date).tz("Europe/Berlin").format("h:mm A");
-  return time;
+  return moment(date).tz("Europe/Berlin").format("HH:mm");
+}
+
+function formatTimeRemaining(durationInMs: number): string {
+  const duration = moment.duration(durationInMs);
+  const hours = Math.floor(duration.asHours());
+  const minutes = duration.minutes();
+  const seconds = duration.seconds();
+  return `${hours}h ${minutes}m ${seconds}s`;
 }
 
 export interface Props {
-  entries: any;
+  prayerTimes: PrayerTimes;
 }
 
-export default (props: Props) => {
+export default ({ prayerTimes }: Props) => {
   const styles = useStyles();
+  const [currentPrayer, setCurrentPrayer] = useState<Prayer | null>(null);
+  const [nextPrayer, setNextPrayer] = useState<Prayer | null>(null);
+  const [nextPrayerTime, setNextPrayerTime] = useState<Date | null>(null);
+  const [timeLeft, setTimeLeft] = useState<string | null>(null);
 
   const includedKeys = [
-    "asr",
-    "dhuhr",
-    "isha",
-    "sunrise",
-    "sunset",
-    "maghrib",
     "fajr",
+    "sunrise",
+    "dhuhr",
+    "asr",
+    "maghrib",
+    "isha",
+    "sunset",
   ];
   const filteredPrayerTimes = Object.fromEntries(
-    Object.entries(props.entries).filter(([key]) => includedKeys.includes(key)),
+    Object?.entries(prayerTimes || {}).filter(([key]) =>
+      includedKeys.includes(key),
+    ),
   );
+
+  useEffect(() => {
+    if (prayerTimes?.currentPrayer) {
+      const current = prayerTimes.currentPrayer();
+      const next = prayerTimes.nextPrayer();
+      const nextTime = prayerTimes.timeForPrayer(next);
+
+      setCurrentPrayer(current);
+      setNextPrayer(next);
+      setNextPrayerTime(nextTime);
+    }
+  }, [prayerTimes]);
+
+  useEffect(() => {
+    if (!nextPrayerTime) return;
+
+    const intervalId = setInterval(() => {
+      const now = new Date();
+      const timeDifference = nextPrayerTime.getTime() - now.getTime();
+      if (timeDifference <= 0) {
+        clearInterval(intervalId); // Stop countdown when time reaches 0
+        setTimeLeft("Time for next prayer!");
+        return;
+      }
+      setTimeLeft(formatTimeRemaining(timeDifference));
+    }, 1000);
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, [nextPrayerTime]);
 
   return (
     <View style={styles.container}>
-      {Object.entries(filteredPrayerTimes).map(([key, val], i) => {
-        const isLast = i === Object.keys(filteredPrayerTimes).length - 1;
+      {Object?.entries(filteredPrayerTimes).map(([key, val]) => {
+        const isCurrent = currentPrayer?.toLowerCase() === key;
         return (
-          <View
-            key={key}
-            style={[
-              styles.row,
-              i === 0 && { paddingTop: 0 },
-              isLast && { paddingBottom: 0 },
-            ]}
-          >
-            <Text style={styles.key}>{key}</Text>
+          <View key={key} style={[styles.row]}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.icon}>
+                {getPrayerIcon({ prayerName: key, current: isCurrent })}
+              </Text>
+              <Text style={[styles.key]}>{key}</Text>
+            </View>
+            {isCurrent && timeLeft && (
+              <Text style={styles.countdown}>{timeLeft}</Text>
+            )}
             <Text style={styles.val}>{getTime(val as Date)}</Text>
           </View>
         );

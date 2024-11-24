@@ -18,6 +18,7 @@ import {
 } from "./PolarCircleResolution";
 import { ValueOf } from "./TypeUtils";
 
+// Jafari ?
 const shadowLength = () => 1;
 
 export default class PrayerTimes {
