@@ -1,18 +1,25 @@
 import Spacing from "@/constants/Spacing";
 import moment from "moment-hijri";
-import React from "react";
+import React, { useRef, useState } from "react";
+import BottomSheet, { BottomSheetModal } from "@gorhom/bottom-sheet";
 import {
   Alert,
   Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { Agenda, AgendaEntry, DateData } from "react-native-calendars";
 import events from "../../assets/events.json";
+import { Stack, router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import BottomSheetComponent from "@/components/ScrollableBottomSheet";
+import Modal from "@/components/BottomSheetModal";
 
 const MyCalendar = () => {
+  const modalRef = useRef<BottomSheetModal>(null);
   const renderItem = (reservation: AgendaEntry, isFirst: boolean) => {
     const fontSize = isFirst ? 16 : 14;
     const color = isFirst ? "black" : "#43515c";
@@ -20,7 +27,7 @@ const MyCalendar = () => {
     return (
       <Pressable
         style={[styles.item, { height: reservation.height }]}
-        onPress={() => Alert.alert(reservation.name)}
+        onPress={() => modalRef.current.present()}
       >
         <Text style={{ fontSize, color }}>{reservation.name}</Text>
       </Pressable>
@@ -65,8 +72,18 @@ const MyCalendar = () => {
       </View>
     );
   };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <Modal
+        ref={modalRef}
+        headline="Custom Modal 🎉"
+        content={
+          <Text style={{ textAlign: "center", height: 100, flex: 1 }}>
+            This is dynamic content inside the modal!
+          </Text>
+        }
+      />
       <Agenda
         items={convertedEvents}
         renderItem={renderItem}

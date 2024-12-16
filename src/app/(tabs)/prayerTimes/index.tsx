@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Pressable,
@@ -30,6 +30,8 @@ import {
 } from "../../../shared/prayTimes/Adhan";
 import Spacing from "@/constants/Spacing";
 import moment from "moment";
+import Modal from "@/components/BottomSheetModal";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 const useStyles = () => {
   const theme = useAppTheme();
@@ -39,7 +41,7 @@ const useStyles = () => {
       marginHorizontal: Spacing.margin.base,
     },
     locationName: {
-      fontSize: 18,
+      fontSize: 16,
       width: "100%",
       textAlign: "center",
       fontWeight: "600",
@@ -67,7 +69,7 @@ const useStyles = () => {
       alignItems: "center",
     },
     date: {
-      fontSize: 16,
+      fontSize: 14,
       letterSpacing: 1,
       fontWeight: "600",
       textTransform: "capitalize",
@@ -131,6 +133,7 @@ export default function PrayerTimes() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [prayerTimes, setPrayerTimes] = useState<PrayTimesCalculator>();
+  const modalRef = useRef<BottomSheetModal>(null);
 
   const getLocation = async () => {
     try {
@@ -197,20 +200,35 @@ export default function PrayerTimes() {
     <>
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerLeft: () => null,
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={() => {
+                modalRef.current.present();
+              }}
+            >
+              <Ionicons name="settings" size={22} />
+            </TouchableOpacity>
+          ),
+          title: "Bönetider",
         }}
       />
 
       <SafeAreaView style={styles.container}>
+        <Modal
+          ref={modalRef}
+          headline="Custom ssettings Modal 🎉"
+          content={
+            <Text style={{ textAlign: "center", flex: 1 }}>
+              Prayer times settings
+            </Text>
+          }
+        />
         <ScrollView contentContainerStyle={styles.screenContent}>
           <Text style={styles.locationName}>{locationName}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={handlePreviousDay} style={styles.button}>
-              <Ionicons
-                name="arrow-back-circle-outline"
-                size={40}
-                color={Colors.softText}
-              />
+              <Ionicons name="chevron-back" size={20} color={Colors.softText} />
             </TouchableOpacity>
             <View style={styles.dates}>
               {formatDate(selectedDate || new Date()).map((date, i) => (
@@ -221,8 +239,8 @@ export default function PrayerTimes() {
             </View>
             <TouchableOpacity onPress={handleNextDay} style={styles.button}>
               <Ionicons
-                name="arrow-forward-circle-outline"
-                size={40}
+                name="chevron-forward"
+                size={20}
                 color={Colors.softText}
               />
             </TouchableOpacity>
