@@ -1,23 +1,29 @@
 import { View, StyleSheet, Image, Text } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { News } from "@/data";
+import { Article } from "@/types";
 
 interface NewsListProps {
-  newsList: News[];
+  newsList: Article[];
 }
 
 const NewsList = ({ newsList }: NewsListProps) => {
   return (
     <View style={styles.container}>
-      {newsList.map((item: News, index: number) => (
-        <View key={index} style={styles.itemContainer}>
-          <Image source={item.image} style={styles.itemImg} />
-          <View style={styles.itemInfo}>
-            <Text style={styles.itemCategory}>{item.categoryId}</Text>
-            <Text style={styles.itemTitle}>{item.title}</Text>
+      {newsList &&
+        newsList.length > 0 &&
+        newsList.map((item: Article, index: number) => (
+          <View key={index} style={styles.itemContainer}>
+            <Image
+              source={{ uri: item.article_img_url }}
+              style={styles.itemImg}
+            />
+            <View style={styles.itemInfo}>
+              <Text style={styles.itemCategory}>{item.topic}</Text>
+              <Text style={styles.itemTitle}>{item.title}</Text>
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
     </View>
   );
 };

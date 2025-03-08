@@ -11,8 +11,14 @@ import FontSize from "../constants/FontSize";
 import { BreakingNewsList, News } from "../data";
 import SliderItem from "./SliderItem";
 import Pagination from "./SliderPagination";
+import { Article } from "@/types";
 
-const BreakingNews: React.FC = () => {
+type BrewingNewsProps = {
+  news: Article[];
+  isLoading?: boolean;
+};
+
+const BreakingNews: React.FC<BrewingNewsProps> = ({ news }) => {
   const [data, setData] = useState<News[]>(BreakingNewsList);
   const [paginationIndex, setPaginationIndex] = useState(0);
   const scrollX = useSharedValue(0);
@@ -86,12 +92,12 @@ const BreakingNews: React.FC = () => {
       <View style={{ justifyContent: "center" }}>
         <Animated.FlatList
           ref={ref}
-          data={data}
+          data={news}
           onScroll={onScrollHandler}
           scrollEventThrottle={16}
           renderItem={({ item, index }) => (
             <SliderItem
-              key={item.id}
+              key={item.article_id}
               slideItem={item}
               index={index}
               scrollX={scrollX}

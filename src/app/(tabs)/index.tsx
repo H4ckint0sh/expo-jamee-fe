@@ -1,5 +1,5 @@
 import BreakingNews from "@/components/BreakingNews";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
 import HorizontalItems, {
   CategoryItem,
@@ -7,12 +7,37 @@ import HorizontalItems, {
 import NewsListComponent from "../../components/NewsList";
 import Spacing from "../../constants/Spacing";
 import { Categories, News, NewsList } from "../../data";
+import { useAxios } from "@/hooks/useAxios";
+import { Article } from "@/types";
 
 const NewsScreen: React.FC = () => {
-  const [news, setNews] = useState<News[]>(NewsList);
+  const [news, setNews] = useState<Article[]>();
+  const [newsWithSameCategory, setNewsWithSameCategory] = useState<Article[]>();
+
+  const { isLoading, sendRequest } = useAxios();
+
+  useEffect(() => {
+    fetchArticles();
+  }, []);
+
+  const fetchArticles = async () => {
+    try {
+      const { articles } = await sendRequest(
+        `http://localhost:8000/api/articles`,
+      );
+
+      if (!isLoading) {
+        setNews(articles);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleCategory = ({ id }: CategoryItem) => {
-    setNews(NewsList.filter((news) => news.categoryId === id));
+    setNewsWithSameCategory(
+      news.filter((news: Article) => news.article_id === id),
+    );
   };
 
   return (
@@ -23,10 +48,10 @@ const NewsScreen: React.FC = () => {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <BreakingNews />
+        <BreakingNews news={news?.slice(0, 5)} />
         <View style={{ marginHorizontal: Spacing.margin.base }}>
           <HorizontalItems onClick={handleCategory} items={Categories} />
-          <NewsListComponent newsList={news} />
+          <NewsListComponent newsList={newsWithSameCategory} />
         </View>
       </ScrollView>
     </SafeAreaView>

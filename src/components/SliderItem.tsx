@@ -1,6 +1,7 @@
 import Font from "@/constants/Font";
 import FontSize from "@/constants/FontSize";
 import { News } from "@/data";
+import { Article } from "@/types";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link } from "expo-router";
 import React from "react";
@@ -19,7 +20,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 type Props = {
-  slideItem: News;
+  slideItem: Article;
   index: number;
   scrollX: SharedValue<number>;
 };
@@ -50,13 +51,16 @@ const SliderItem = ({ slideItem, index, scrollX }: Props) => {
     };
   });
   return (
-    <Link href={`/news/${slideItem.id}`} asChild>
+    <Link href={`/news/${slideItem.article_id}`} asChild>
       <TouchableOpacity>
         <Animated.View
           style={[styles.itemWrapper, animatedStyles]}
-          key={slideItem.id}
+          key={slideItem.article_id}
         >
-          <Image source={slideItem.image} style={styles.image} />
+          <Image
+            source={{ uri: slideItem.article_img_url }}
+            style={styles.image}
+          />
           <LinearGradient
             colors={["transparent", "rgba(0,0,0,0.8)"]}
             style={styles.background}
