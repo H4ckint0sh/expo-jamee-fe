@@ -4,13 +4,15 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Article } from "@/types";
 import { useAxios } from "@/hooks/useAxios";
+import FontSize from "@/constants/FontSize";
+import { Colors } from "@/constants/Colors";
 
 type Props = {};
 
 const NewsDetails = (props: Props) => {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const [articel, setArticel] = useState<Article>();
+  const [article, setArticle] = useState<Article>();
 
   const { isLoading, sendRequest } = useAxios();
   useEffect(() => {
@@ -19,11 +21,11 @@ const NewsDetails = (props: Props) => {
 
   const fetchArticle = async () => {
     try {
-      const { articles: article } = await sendRequest(
-        `${process.env.EXPO_PUBLIC_BASE_URL}/articles${id}`,
+      const { article } = await sendRequest(
+        `${process.env.EXPO_PUBLIC_BASE_URL}/articles/${id}`,
       );
       if (!isLoading) {
-        setArticel(article);
+        setArticle(article);
       }
     } catch (error) {
       console.log(error);
@@ -44,11 +46,11 @@ const NewsDetails = (props: Props) => {
               <Ionicons name="heart-outline" size={22} />
             </TouchableOpacity>
           ),
-          title: "",
+          title: article?.title,
         }}
       />
       <View>
-        <Text>{articel?.title}</Text>
+        <Text style={styles.title}>{article?.title}</Text>
       </View>
     </>
   );
@@ -56,4 +58,10 @@ const NewsDetails = (props: Props) => {
 
 export default NewsDetails;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  title: {
+    fontSize: FontSize.base,
+    fontWeight: "600",
+    color: Colors.black,
+  },
+});
