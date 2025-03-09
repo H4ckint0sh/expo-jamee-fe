@@ -43,8 +43,8 @@ const styles = StyleSheet.create({
   },
   itemImg: {
     width: 90,
-    height: 100,
-    borderRadius: 20,
+    height: 60,
+    borderRadius: 10,
     marginRight: 10,
   },
   itemInfo: {

@@ -1,6 +1,13 @@
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Image,
+  ScrollView,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Article } from "@/types";
 import { useAxios } from "@/hooks/useAxios";
@@ -46,12 +53,18 @@ const NewsDetails = (props: Props) => {
               <Ionicons name="heart-outline" size={22} />
             </TouchableOpacity>
           ),
-          title: article?.title,
+          title: "",
         }}
       />
-      <View>
+      <ScrollView style={styles.container}>
         <Text style={styles.title}>{article?.title}</Text>
-      </View>
+        <Text style={styles.date}>{article?.created_at}</Text>
+        <Image
+          style={styles.image}
+          source={{ uri: article?.article_img_url }}
+        />
+        <Text style={styles.body}>{article?.body}</Text>
+      </ScrollView>
     </>
   );
 };
@@ -59,9 +72,31 @@ const NewsDetails = (props: Props) => {
 export default NewsDetails;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    marginBottom: 20,
+  },
   title: {
     fontSize: FontSize.base,
     fontWeight: "600",
     color: Colors.black,
+  },
+  date: {
+    fontSize: FontSize.sm,
+    color: Colors.darkGrey,
+    paddingTop: 20,
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    marginTop: 10,
+    borderRadius: 10,
+  },
+  body: {
+    fontSize: FontSize.base,
+    color: Colors.black,
+    paddingVertical: 10,
+    lineHeight: 24,
   },
 });

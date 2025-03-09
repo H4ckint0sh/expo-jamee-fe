@@ -52,7 +52,7 @@ const SliderItem = ({ slideItem, index, scrollX }: Props) => {
   });
   return (
     <Link href={`/news/${slideItem.article_id}`} asChild>
-      <TouchableOpacity>
+      <TouchableOpacity activeOpacity={1}>
         <Animated.View
           style={[styles.itemWrapper, animatedStyles]}
           key={slideItem.article_id}
