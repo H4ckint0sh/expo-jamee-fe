@@ -2,24 +2,33 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { AllNews, News } from "@/data";
+import { Article } from "@/types";
+import { useAxios } from "@/hooks/useAxios";
 
 type Props = {};
 
 const NewsDetails = (props: Props) => {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const [articel, setArticel] = useState<News>();
+  const [articel, setArticel] = useState<Article>();
 
+  const { isLoading, sendRequest } = useAxios();
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setArticel(AllNews.find((news) => news.id == id));
-    }, 3000);
-
-    return () => {
-      clearTimeout(timer);
-    };
+    fetchArticle();
   }, []);
+
+  const fetchArticle = async () => {
+    try {
+      const { articles: article } = await sendRequest(
+        `${process.env.EXPO_PUBLIC_BASE_URL}/articles${id}`,
+      );
+      if (!isLoading) {
+        setArticel(article);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -39,7 +48,7 @@ const NewsDetails = (props: Props) => {
         }}
       />
       <View>
-        <Text>NewsDetails {id}</Text>
+        <Text>{articel?.title}</Text>
       </View>
     </>
   );

@@ -57,7 +57,7 @@ const NewsScreen: React.FC = () => {
         }}
         showsVerticalScrollIndicator={false}
       >
-        <BreakingNews news={news?.slice(0, 5)} />
+        {news?.length > 0 && <BreakingNews news={news?.slice(0, 5)} />}
         <View style={{ marginHorizontal: Spacing.margin.base }}>
           <HorizontalItems onClick={handleCategory} items={topics} />
           <NewsListComponent newsList={newsWithSameCategory} />

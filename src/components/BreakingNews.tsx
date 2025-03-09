@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Text, View, ViewToken, useWindowDimensions } from "react-native";
+import {
+  AlertStatic,
+  Text,
+  View,
+  ViewToken,
+  useWindowDimensions,
+} from "react-native";
 import Animated, {
   useAnimatedRef,
   useAnimatedScrollHandler,
@@ -8,7 +14,6 @@ import Animated, {
   scrollTo,
 } from "react-native-reanimated";
 import FontSize from "../constants/FontSize";
-import { BreakingNewsList, News } from "../data";
 import SliderItem from "./SliderItem";
 import Pagination from "./SliderPagination";
 import { Article } from "@/types";
@@ -19,7 +24,7 @@ type BrewingNewsProps = {
 };
 
 const BreakingNews: React.FC<BrewingNewsProps> = ({ news }) => {
-  const [data, setData] = useState<News[]>(BreakingNewsList);
+  const [data, setData] = useState<Article[]>(news);
   const [paginationIndex, setPaginationIndex] = useState(0);
   const scrollX = useSharedValue(0);
   const ref = useAnimatedRef<Animated.FlatList<any>>();
@@ -37,7 +42,7 @@ const BreakingNews: React.FC<BrewingNewsProps> = ({ news }) => {
       viewableItems[0]?.index !== undefined &&
       viewableItems[0]?.index !== null
     ) {
-      setPaginationIndex(viewableItems[0].index % data.length);
+      setPaginationIndex(viewableItems[0].index % data?.length);
     }
   };
 
@@ -92,7 +97,7 @@ const BreakingNews: React.FC<BrewingNewsProps> = ({ news }) => {
       <View style={{ justifyContent: "center" }}>
         <Animated.FlatList
           ref={ref}
-          data={news}
+          data={data}
           onScroll={onScrollHandler}
           scrollEventThrottle={16}
           renderItem={({ item, index }) => (
@@ -108,7 +113,7 @@ const BreakingNews: React.FC<BrewingNewsProps> = ({ news }) => {
           showsHorizontalScrollIndicator={false}
           pagingEnabled
           onEndReachedThreshold={0.5}
-          onEndReached={() => setData([...data, ...BreakingNewsList])}
+          onEndReached={() => setData([...data, ...news])} // add news
           viewabilityConfigCallbackPairs={
             viewabilityConfigCallbackPairs.current as any
           }
@@ -117,7 +122,7 @@ const BreakingNews: React.FC<BrewingNewsProps> = ({ news }) => {
         />
       </View>
       <Pagination
-        items={BreakingNewsList}
+        items={news}
         paginationIndex={paginationIndex}
         scrollX={scrollX}
       />
