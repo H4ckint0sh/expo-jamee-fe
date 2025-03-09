@@ -1,5 +1,5 @@
 import { ScrollView, TouchableOpacity, Text, View } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useColors from "../hooks/useColors";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";

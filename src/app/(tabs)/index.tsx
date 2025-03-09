@@ -4,7 +4,6 @@ import { SafeAreaView, ScrollView, View } from "react-native";
 import HorizontalItems from "../../components/HorizontalItems";
 import NewsListComponent from "../../components/NewsList";
 import Spacing from "../../constants/Spacing";
-import { Categories, News, NewsList } from "../../data";
 import { useAxios } from "@/hooks/useAxios";
 import { Article } from "@/types";
 
@@ -29,12 +28,17 @@ const NewsScreen: React.FC = () => {
     setTopics(topics);
   }, [news]);
 
+  useEffect(() => {
+    setNewsWithSameCategory(
+      news?.filter((news: Article) => news.topic === topics[0]),
+    );
+  }, [topics]);
+
   const fetchArticles = async () => {
     try {
       const { articles } = await sendRequest(
         `${process.env.EXPO_PUBLIC_BASE_URL}/articles`,
       );
-
       if (!isLoading) {
         setNews(articles);
       }
@@ -45,7 +49,7 @@ const NewsScreen: React.FC = () => {
 
   const handleCategory = (topic: string): void => {
     setNewsWithSameCategory(
-      news.filter((news: Article) => news.topic === topic),
+      news?.filter((news: Article) => news.topic === topic),
     );
   };
 
