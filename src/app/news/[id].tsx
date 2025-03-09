@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: FontSize.sm,
-    color: Colors.darkGrey,
+    color: Colors.softText,
     paddingTop: 20,
   },
   image: {

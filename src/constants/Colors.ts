@@ -1,12 +1,13 @@
 export const Colors = {
   background: "#F4F4F4",
-  tint: "#FF4C4C",
+  tint: "#006D5B",
   tabIconDefault: "#687076",
-  tabIconSelected: "#FF4C4C",
+  tabIconSelected: "#04724D",
   white: "#fff",
   border: "#E0E0E0",
   black: "#333",
   darkGrey: "#666",
   lightGrey: "#999",
   softText: "#555",
+  transparent: "transparent",
 };

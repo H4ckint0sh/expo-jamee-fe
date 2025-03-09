@@ -20,7 +20,10 @@ const Pagination = ({ items, paginationIndex }: Props) => {
             styles.dot,
             {
               backgroundColor:
-                index === paginationIndex ? Colors.tint : Colors.darkGrey,
+                index === paginationIndex ? Colors.tint : Colors.transparent,
+              borderWidth: 1,
+              borderColor:
+                index === paginationIndex ? Colors.tint : Colors.softText,
             },
           ]}
           key={index}
