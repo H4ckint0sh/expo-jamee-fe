@@ -1,9 +1,7 @@
 import BreakingNews from "@/components/BreakingNews";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
-import HorizontalItems, {
-  CategoryItem,
-} from "../../components/HorizontalItems";
+import HorizontalItems from "../../components/HorizontalItems";
 import NewsListComponent from "../../components/NewsList";
 import Spacing from "../../constants/Spacing";
 import { Categories, News, NewsList } from "../../data";
@@ -13,6 +11,7 @@ import { Article } from "@/types";
 const NewsScreen: React.FC = () => {
   const [news, setNews] = useState<Article[]>();
   const [newsWithSameCategory, setNewsWithSameCategory] = useState<Article[]>();
+  const [topics, setTopics] = useState<string[]>([]);
 
   const { isLoading, sendRequest } = useAxios();
 
@@ -20,10 +19,20 @@ const NewsScreen: React.FC = () => {
     fetchArticles();
   }, []);
 
+  useEffect(() => {
+    const topics = news?.reduce((acc: string[], curr: Article) => {
+      if (!acc.includes(curr.topic)) {
+        acc.push(curr.topic);
+      }
+      return acc;
+    }, []);
+    setTopics(topics);
+  }, [news]);
+
   const fetchArticles = async () => {
     try {
       const { articles } = await sendRequest(
-        `http://localhost:8000/api/articles`,
+        `${process.env.EXPO_PUBLIC_BASE_URL}/articles`,
       );
 
       if (!isLoading) {
@@ -34,9 +43,9 @@ const NewsScreen: React.FC = () => {
     }
   };
 
-  const handleCategory = ({ id }: CategoryItem) => {
+  const handleCategory = (topic: string): void => {
     setNewsWithSameCategory(
-      news.filter((news: Article) => news.article_id === id),
+      news.filter((news: Article) => news.topic === topic),
     );
   };
 
@@ -50,7 +59,7 @@ const NewsScreen: React.FC = () => {
       >
         <BreakingNews news={news?.slice(0, 5)} />
         <View style={{ marginHorizontal: Spacing.margin.base }}>
-          <HorizontalItems onClick={handleCategory} items={Categories} />
+          <HorizontalItems onClick={handleCategory} items={topics} />
           <NewsListComponent newsList={newsWithSameCategory} />
         </View>
       </ScrollView>

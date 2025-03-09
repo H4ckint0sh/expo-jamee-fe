@@ -1,11 +1,4 @@
-import {
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  ImageSourcePropType,
-  Text,
-  View,
-} from "react-native";
+import { ScrollView, TouchableOpacity, Text, View } from "react-native";
 import React, { useRef, useState } from "react";
 import useColors from "../hooks/useColors";
 import Spacing from "../constants/Spacing";
@@ -14,16 +7,11 @@ import Font from "../constants/Font";
 import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/Colors";
 import { scrollTo } from "react-native-reanimated";
-
-export type CategoryItem = {
-  id: number;
-  name: string;
-  image?: ImageSourcePropType;
-};
+import { Article } from "@/types";
 
 type Props = {
-  items: CategoryItem[];
-  onClick?: (item: CategoryItem) => void;
+  items: string[];
+  onClick?: (topic: string) => void; // onClick prop
   showAddButton?: boolean;
 };
 
@@ -31,7 +19,7 @@ const CategoryList: React.FC<Props> = ({ items, onClick, showAddButton }) => {
   const colors = useColors();
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const scrollRef = useRef<ScrollView>(null);
-  const itemRef = useRef<TouchableOpacity[] | null[]>([]);
+  const itemRef = useRef<any[] | null[]>([]);
 
   const handleSelectCategory = (index: number) => {
     const selected = itemRef.current[index];
@@ -63,60 +51,34 @@ const CategoryList: React.FC<Props> = ({ items, onClick, showAddButton }) => {
       >
         <>
           {showAddButton && <AddButton rounded={false} />}
-          {items.map((item, index) =>
-            item.image ? (
-              <TouchableOpacity
-                key={index}
-                ref={(el) => (itemRef.current[index] = el)}
-                onPress={() => handleSelectCategory(index)}
+          {items?.map((topic, index) => (
+            <TouchableOpacity
+              key={`item-${index}`}
+              ref={(el) => (itemRef.current[index] = el)}
+              onPress={() => handleSelectCategory(index)}
+              style={{
+                paddingHorizontal: Spacing.padding.lg,
+                paddingVertical: Spacing.margin.base,
+                borderRadius: Spacing.borderRadius.base,
+                marginRight: Spacing.margin.base,
+                borderWidth: 1,
+                backgroundColor:
+                  activeIndex === index ? Colors.tint : colors.background,
+                borderColor:
+                  activeIndex === index ? Colors.tint : colors.border,
+              }}
+            >
+              <Text
                 style={{
-                  height: 70,
-                  width: 70,
-                  backgroundColor: colors.primary,
-                  borderRadius: Spacing.borderRadius.xxl,
-                  padding: Spacing.padding.sm,
-                  marginRight: Spacing.margin.base,
+                  fontSize: FontSize.sm,
+                  fontWeight: "600",
+                  color: activeIndex === index ? Colors.white : Colors.softText,
                 }}
               >
-                <Image
-                  source={item.image}
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                  }}
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                key={item.id}
-                ref={(el) => (itemRef.current[index] = el)}
-                onPress={() => handleSelectCategory(index)}
-                style={{
-                  paddingHorizontal: Spacing.padding.lg,
-                  paddingVertical: Spacing.margin.base,
-                  borderRadius: Spacing.borderRadius.base,
-                  marginRight: Spacing.margin.base,
-                  borderWidth: 1,
-                  backgroundColor:
-                    activeIndex === index ? Colors.tint : colors.background,
-                  borderColor:
-                    activeIndex === index ? Colors.tint : colors.border,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: FontSize.sm,
-                    fontWeight: "600",
-                    color:
-                      activeIndex === index ? Colors.white : Colors.softText,
-                  }}
-                >
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
-            ),
-          )}
+                {topic}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </>
       </ScrollView>
     </View>
